@@ -156,9 +156,12 @@ export class ReservedTokensInputBlock extends React.Component {
               errorMessage="The inserted address is invalid"
             />
             <RadioInputField
-              extraClassName="reserved-tokens-input-property reserved-tokens-input-property-middle"
+              side="reserved-tokens-input-property reserved-tokens-input-property-middle"
               title={DIMENSION}
-              items={[{ label: 'tokens', value: 'tokens' }, { label: 'percentage', value: 'percentage' }]}
+              items={['tokens', 'percentage']}
+              vals={['tokens', 'percentage']}
+              defaultValue={this.props.reservedTokenInputStore.dim}
+              name={'reserved-tokens-dim'}
               onChange={e => this.updateReservedTokenInput(e, 'dim')}
               description={`Fixed amount or % of crowdsaled tokens. Will be deposited to the account after fintalization of the crowdsale. `}
             />

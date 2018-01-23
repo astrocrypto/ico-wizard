@@ -19,7 +19,7 @@ import {
 } from "../../utils/constants";
 import { inject, observer } from "mobx-react";
 import { Loader } from '../Common/Loader'
-import { noGasPriceAvailable, warningOnMainnetAlert } from '../../utils/alerts'
+import { noGasPriceAvailable, warningOnMainnetAlert, mainnetIsOnMaintenance } from '../../utils/alerts'
 
 const { CROWDSALE_SETUP } = NAVIGATION_STEPS;
 const { EMPTY, VALID } = VALIDATION_TYPES;
@@ -173,7 +173,8 @@ export class stepThree extends React.Component {
               }, 0)
             }
 
-            return warningOnMainnetAlert(tiersCount, priceSelected, reservedCount, whitelistCount, this.goToDeploymentStage)
+            //return warningOnMainnetAlert(tiersCount, priceSelected, reservedCount, whitelistCount, this.goToDeploymentStage)
+            return mainnetIsOnMaintenance()
           }
           this.goToDeploymentStage()
         })
@@ -320,10 +321,14 @@ export class stepThree extends React.Component {
             description={`Minimum amount tokens to buy. Not a minimal size of a transaction. If minCap is 1 and user bought 1 token in a previous transaction and buying 0.1 token it will allow him to buy.`}
           />
           <RadioInputField
-            extraClassName="right"
+            side="right"
             title={ENABLE_WHITELISTING}
-            items={[{ label: 'yes', value: 'yes' }, { label: 'no', value: 'no' }]}
+            items={["yes", "no"]}
+            vals={["yes", "no"]}
+            state={this.state}
+            num={0}
             defaultValue={tierStore.tiers[0].whitelistEnabled}
+            name="crowdsale-whitelistEnabled-0"
             onChange={e => this.updateWhitelistEnabled(e)}
             description={`Enables whitelisting. If disabled, anyone can participate in the crowdsale.`}
           />
@@ -369,10 +374,14 @@ export class stepThree extends React.Component {
                   description={`Name of a tier, e.g. PrePreIco, PreICO, ICO with bonus A, ICO with bonus B, etc. We simplified that and will increment a number after each tier.`}
                 />
                 <RadioInputField
-                  extraClassName="right"
+                  side="right"
                   title={ALLOWMODIFYING}
-                  items={[{ label: 'on', value: 'on' }, { label: 'off', value: 'off' }]}
-                  defaultValue="off"
+                  items={["on", "off"]}
+                  vals={["on", "off"]}
+                  state={this.state}
+                  num={0}
+                  defaultValue={tierStore.tiers[0].updatable}
+                  name="crowdsale-updatable-0"
                   onChange={e => this.updateTierStore(e, "updatable", 0)}
                   description={`Pandora box feature. If it's enabled, a creator of the crowdsale can modify Start time, End time, Rate, Limit after publishing.`}
                 />
