@@ -1,5 +1,5 @@
 import { incorrectNetworkAlert, noMetaMaskAlert, invalidNetworkIDAlert } from './alerts'
-import { CHAINS, MAX_GAS_PRICE } from './constants'
+import { CHAINS } from './constants'
 import { crowdsaleStore, generalStore, web3Store } from '../stores'
 import { fetchFile } from './utils'
 
@@ -71,10 +71,6 @@ export function getNetWorkNameById (_id) {
   }
 }
 
-export const calculateGasLimit = (estimatedGas = 0) => {
-  return !estimatedGas || estimatedGas > MAX_GAS_PRICE ? MAX_GAS_PRICE : estimatedGas + 100000
-}
-
 export function getNetworkVersion () {
   const { web3 } = web3Store
 
@@ -120,23 +116,26 @@ const deployContractInner = (accounts, abi, deployOpts) => {
   console.log('abi', abi)
 
   const { web3 } = web3Store
+  const estimatedGasMax = 4016260
   const objAbi = JSON.parse(JSON.stringify(abi))
   const contractInstance = new web3.eth.Contract(objAbi)
-  const deploy = contractInstance.deploy(deployOpts)
 
-  return deploy.estimateGas({ gas: MAX_GAS_PRICE })
+  return contractInstance.deploy(deployOpts).estimateGas({ gas: estimatedGasMax })
     .then(
       estimatedGas => estimatedGas,
       err => console.log('errrrrrrrrrrrrrrrrr', err)
     )
     .then(estimatedGas => {
       console.log('gas is estimated', estimatedGas)
+      const gas = !estimatedGas || estimatedGas > estimatedGasMax ? estimatedGasMax : estimatedGas + 100000
       const sendOpts = {
         from: accounts[0],
         gasPrice: generalStore.gasPrice,
-        gas: calculateGasLimit(estimatedGas)
+        gas
       }
-      return sendTX(deploy.send(sendOpts), DEPLOY_CONTRACT)
+      const method = contractInstance.deploy(deployOpts).send(sendOpts)
+
+      return sendTX(method, DEPLOY_CONTRACT)
     })
 }
 
